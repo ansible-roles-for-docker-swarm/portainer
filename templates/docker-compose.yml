@@ -1,0 +1,69 @@
+version: '3.4'
+
+networks:
+  {{ public_network_name }}:
+    external: true
+
+#  agent_network:
+#    driver: overlay
+#    attachable: true
+
+services:
+  portainer:
+    image: "{{ portainer_image }}:{{ portainer_image_tag }}"
+    command:
+      -H
+      tcp://tasks.agent:9001
+      --tlsskipverify
+      --admin-password '{{ portainer_admin_password }}'
+#      unix:///var/run/docker.sock
+    volumes:
+#      - type: bind
+#        source: /var/run/docker.sock
+#        target: /var/run/docker.sock
+      - type: bind
+        source: "{{ portainer_data_directory }}"
+        target: /data
+
+#    ports:
+#      - "9443:9443"
+#      - "9000:9000"
+#      - "8000:8000"
+
+    deploy:
+      labels:
+        traefik.enable: "true"
+        traefik.port: 9000
+        traefik.frontend.rule: Host:{{ portainer_domain }}
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+
+    networks:
+      - "{{ public_network_name }}"
+
+{% if consul_datadog_logs_enable %}
+    labels:
+      com.datadoghq.ad.logs: '[{}]'
+{% endif %}
+
+  agent:
+    image: {{ portainer_agent_image }}:{{ portainer_agent_image_tag }}
+    volumes:
+      - type: bind
+        source: /var/run/docker.sock
+        target: /var/run/docker.sock
+      - type: bind
+        source: /var/lib/docker/volumes
+        target: /var/lib/docker/volumes
+    networks:
+      - {{ public_network_name }}
+    deploy:
+      mode: global
+
+{% if consul_datadog_logs_enable %}
+    labels:
+      com.datadoghq.ad.logs: '[{}]'
+{% endif %}

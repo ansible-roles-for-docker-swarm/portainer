@@ -1,0 +1,9 @@
+---
+
+- name: Deploy portainer stack
+  docker_stack:
+    state: present
+    name: portainer
+    resolve_image: never
+    compose:
+      - "{{ portainer_docker_compose_file }}"

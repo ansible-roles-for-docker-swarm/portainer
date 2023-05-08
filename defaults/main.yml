@@ -1,0 +1,22 @@
+---
+
+portainer_domain: "portainer.{{ public_hostname }}"
+
+  
+portainer_basic_auth: 
+
+portainer_directory: /srv/portainer
+portainer_data_directory: "{{ portainer_directory }}/data"
+
+portainer_docker_compose_file: "{{ portainer_directory }}/docker-compose.yml"
+
+# https://gist.github.com/deviantony/62c009b41bde5e078b1a7de9f11f5e55
+portainer_admin_password: $$2y$$05$$ZBq/6oanDzs3iwkhQCxF2uKoJsGXA0SI4jdu1PkFrnsKfpCH5Ae4G
+
+portainer_image: portainer/portainer-ce
+portainer_image_tag: 2.9.1
+
+portainer_agent_image: portainer/agent
+portainer_agent_image_tag: "{{ portainer_image_tag }}"
+
+public_network_name: public

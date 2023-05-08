@@ -1,0 +1,16 @@
+---
+
+- name: Ensure portainer directory on docker host
+  file:
+    state: directory
+    owner: 1000
+    group: 1000
+    path: "{{ portainer_data_directory }}"
+
+
+- name: Deploy portainer docker-compose.yml
+  template:
+    src: docker-compose.yml
+    dest: "{{ portainer_docker_compose_file }}"
+
+- include_tasks: docker.yml
